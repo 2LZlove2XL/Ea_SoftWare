@@ -21,7 +21,6 @@ docx_save_path=tk.StringVar(value=Val_docx_save_path)
 data_length=tk.IntVar(value=1)
 
 def open_docx():
-    # 这里填写你本地的docx文件路径
     file_path = os.path.join(os.path.dirname(sys.executable), '..') + "/template/静态点检V1.0使用说明.docx"
     try:
         os.startfile(file_path)  # Windows下可以使用startfile直接打开文件
@@ -164,5 +163,5 @@ submit_button.grid(row=3, column=1, pady=20)
 # 水印
 watermark = tk.Label(root, text="性能验收科所有 © 2024", fg="lightgray", bg="white")
 watermark.place(relx=1.0, rely=1.0, anchor='se')
-# 启动GUI主循环
+
 root.mainloop()
