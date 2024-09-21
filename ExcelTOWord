@@ -1,1 +1,167 @@
+import os
+import sys
+import tkinter as tk
+from tkinter import filedialog, messagebox ,Menu
+from docx import Document
+import openpyxl
+import webbrowser
+
+root = tk.Tk()
+root.title("静态点检转换V1.0")
+root.geometry("600x250")
+root.configure(bg="lightgrey")
+menu_bar = Menu(root)
+
+Val_excel_path = os.path.join(os.path.dirname(sys.executable), '..') + "静态点检.xlsx"
+Val_docx_save_path=os.path.join(os.path.dirname(sys.executable), '..') + "/OutPut/"
+
+excel_file_path=tk.StringVar(value=Val_excel_path)
+docx_save_path=tk.StringVar(value=Val_docx_save_path)
+data_length=tk.IntVar(value=1)
+
+def open_docx():
+    # 这里填写你本地的docx文件路径
+    file_path = os.path.join(os.path.dirname(sys.executable), '..') + "/template/静态点检V1.0使用说明.docx"
+    try:
+        os.startfile(file_path)  # Windows下可以使用startfile直接打开文件
+    except Exception as e:
+        print(f"无法打开文件: {e}")
+
+def open_website():
+    url = "https://github.com/LLZloveZY/Ea_SoftWare/blob/main/ExcelTOWord"
+    webbrowser.open_new(url)
+
+def select_excel_file():
+    file_path = filedialog.askopenfilename(
+        title="选择需要处理的Excel文件",
+        filetype=[("Excel 文件", "*.xlsx *.xls")]
+    )
+    if file_path:
+        excel_file_path.set(file_path)
+
+
+def select_docx_save_location():
+    folder_path = filedialog.askdirectory(
+        title="选择 DOCX 文件保存文件夹"
+    )
+    if folder_path:
+        docx_save_path.set(folder_path)  # 将选择的文件夹路径保存
+
+def submit():
+    excel_path = excel_file_path.get()
+    docx_path = docx_save_path.get()
+
+    if not excel_path or not docx_path:
+        messagebox.showerror("错误", "请选择Excel文件和输出位置！")
+        return
+
+    try:
+        process_excel_to_docx(excel_path, docx_path, data_length.get())
+        messagebox.showinfo("成功", "文件已成功转换！")
+    except Exception as e:
+        messagebox.showerror("错误", f"转换过程中发生错误：{e}")
+
+
+def process_excel_to_docx(excel_file, docx_file, excel_data_length):
+    word_template_path = os.path.join(os.path.dirname(sys.executable),
+                                      '..') + "/template/DPDVR-ZD43-V002-2024-XX项目制动系统设计验证报告之发车点检报告-20240913.docx"
+    wb = openpyxl.load_workbook(excel_file)
+    sheet = wb.active
+    data = list(sheet.iter_rows(min_row=2, max_row=excel_data_length+1, min_col=4, max_col=75, values_only=True))
+    #    print(data)
+
+    # Open the Word template
+    doc = Document(word_template_path)
+    for i, row in enumerate(data):
+        # Example: fill data in Word table
+        table = doc.tables[1]
+        table.cell(4, 1).text = str(row[0])
+        table.cell(4, 3).text = str(row[1])
+        table.cell(5, 3).text = str(row[2])
+        table.cell(6, 1).text = str(row[3])
+        table.cell(7, 1).text = str(row[4])
+        table.cell(6, 3).text = str(row[5])
+        table.cell(7, 3).text = str(row[6])
+        table.cell(8, 1).text = str(row[7])
+        table.cell(9, 1).text = str(row[8])
+        table.cell(8, 3).text = str(row[9])
+        table.cell(9, 3).text = str(row[10])
+        table.cell(10, 1).text = str(row[11])
+        table.cell(11, 1).text = str(row[12])
+        table.cell(10, 3).text = str(row[13])
+        table.cell(11, 3).text = str(row[14])
+
+        # RMCU 软件版本
+        table.cell(18, 3).text = str(row[15])
+        table.cell(19, 1).text = str(row[16])
+        table.cell(20, 5).text = str(row[17])
+        table.cell(21, 1).text = str(row[18])
+        table.cell(22, 1).text = str(row[19])
+        table.cell(21, 3).text = str(row[20])
+        table.cell(22, 3).text = str(row[21])
+
+        # 操作第四个表格
+        table4 = doc.tables[3]
+        table4.cell(1, 2).text = str(row[22])
+        table4.cell(2, 2).text = str(row[23])
+        table4.cell(3, 2).text = str(row[24])
+        table4.cell(4, 3).text = str(row[25])
+        table4.cell(5, 3).text = str(row[26])
+        table4.cell(6, 3).text = str(row[27])
+        table4.cell(7, 4).text = f"{row[28]}{row[29]}"
+        table4.cell(8, 3).text = str(row[30])
+        table4.cell(9, 3).text = str(row[31])
+        table4.cell(10, 2).text = str(row[32])
+
+        for j1 in range(11, 34):
+            table4.cell(j1, 3).text = str(row[33 + j1 - 11])
+        # 特殊条件
+        if str(row[56]) == "否":
+            table4.cell(34, 3).text = str(row[56]) + str(row[57]) + "异常"
+        else:
+            table4.cell(34, 3).text = str(row[56])
+        for j2 in range(35, 48):
+            table4.cell(j2, 3).text = str(row[58 + j2 - 35])
+        new_file_name = os.path.join(docx_file, f"{row[71]}_项目制动系统设计验证报告之发车点检报告.docx")
+        doc.save(new_file_name)
+        print(f"Saved: {new_file_name}")
+    if not os.path.exists(excel_file):
+        raise FileNotFoundError("Excel 文件不存在")
+
+
+
+#菜单
+help_menu = Menu(menu_bar, tearoff=0)  # tearoff=0 禁用菜单分离
+help_menu.add_command(label="使用说明", command=open_docx)  # 使用说明菜单项，打开docx文件
+help_menu.add_command(label="软件代码", command=open_website)  # 软件代码菜单项，跳转到网页
+menu_bar.add_cascade(label="帮助", menu=help_menu)
+root.config(menu=menu_bar)
+
+# 控件区
+frame = tk.Frame(root)
+frame.pack(padx=10, pady=10)
+
+# Excel文件选择框
+tk.Label(frame, text="选择Excel文件:").grid(row=0, column=0, padx=5, pady=5, sticky="e")
+tk.Entry(frame, textvariable=excel_file_path, width=50).grid(row=0, column=1, padx=5, pady=5)
+tk.Button(frame, text="浏览", command=select_excel_file).grid(row=0, column=2, padx=5, pady=5)
+
+# DOCX文件保存位置
+tk.Label(frame, text="输出DOCX文件位置:").grid(row=1, column=0, padx=5, pady=5, sticky="e")
+tk.Entry(frame, textvariable=docx_save_path, width=50).grid(row=1, column=1, padx=5, pady=5)
+tk.Button(frame, text="浏览", command=select_docx_save_location).grid(row=1, column=2, padx=5, pady=5)
+
+# 数据处理长度
+tk.Label(frame, text="想处理几条数据:").grid(row=2, column=0, padx=5, pady=5, sticky="e")
+tk.Entry(frame, textvariable=data_length, width=10).grid(row=2, column=1, padx=5, pady=5, sticky="w")
+
+# 提交按钮
+submit_button = tk.Button(frame, text="提交", command=submit, width=10, height=2, fg="red", bg="lightblue")
+submit_button.grid(row=3, column=1, pady=20)
+
+# 水印
+watermark = tk.Label(root, text="性能验收科所有 © 2024", fg="lightgray", bg="white")
+watermark.place(relx=1.0, rely=1.0, anchor='se')
+# 启动GUI主循环
+root.mainloop()
 
