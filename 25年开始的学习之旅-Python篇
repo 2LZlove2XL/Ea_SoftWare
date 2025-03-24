@@ -1,1 +1,8 @@
-
+# 匿名函数（关键字lambda）
+# lambda x:2*x -> lambda后接形参名，:后接映射关系
+single_para_Func = lambda x:2*x
+multi_parq_Func = lambda a,b:a+b
+# 示例：对于filter()函数，这是一个筛选器，函数第一个参数，返回类型需要为bool类型，第二个参数需要为可迭代对象。
+my_list=[[1,2],[2,3],[3,4,5],[4,5,6]]
+list(filter(lambda x:len(x)>=2,x=my_list))
+# 以上code中，最后out：输出一个列表，其中列表中则包括了全是长度大小>=2的列表对象
