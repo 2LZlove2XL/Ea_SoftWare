@@ -6,3 +6,33 @@ multi_parq_Func = lambda a,b:a+b
 my_list=[[1,2],[2,3],[3,4,5],[4,5,6]]
 list(filter(lambda x:len(x)>=2,x=my_list))
 # 以上code中，最后out：输出一个列表，其中列表中则包括了全是长度大小>=2的列表对象
+
+
+# 打包函数（关键字zip）
+mid = [70,78,90,76]
+final =[89.90.88,92]
+for mid_score,finnal_score in zip(mid,final):
+  print(mid_score,final_score)
+#out：70 89
+      78 90
+      90 88
+      76 92
+# 对于以上的示例进行进一步优化，我们可以直接使用zip()函数得到全年最终成绩，假如mid占比0.4，fianl占比0.6，则使用zip()
+[mid_score*0.4+final_score*0.6 for mid_score,final_score in zip(mid,final)]
+
+
+# NumPy基础
+NumPy数组的构造方式多种多样，其中可以采用arry()来进行数组的建立
+import numpy as np
+np.arry([1,2,3])
+# 示例1（等差数列）
+生成等差数列需要使用到的函数是np.arrange()以及np.linspace(),其中前者的三个参数分别代表了起始点，终止点与样本个数，后者函数的三个参数代表了起始点，终止点与步长
+
+# 示例2（矩阵）
+可以使用相关函数生成一些特殊矩阵，例如np.zeros(),np.ones(),np.eye(),np.full(),其中np.zeros()和np.ones()的传入参数为元组，其中元组对应的是生成矩阵的维度
+
+# 示例3（随机数组）
+最常用的随机生成数组函数为uniform(),normal(),randint()以及choice(),都是来自与np.random模块，分别表示均匀分布的随机数组，正态分布的随机数组、随机整数数组以及随机列表抽样
+使用uniform(a,b,size)能够生成服从U[a,b]且数组维度为size的均匀分布的数组
+np.random.uniform(-1,2,3)
+out:array([......])
